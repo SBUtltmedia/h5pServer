@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truth Table Challenge</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap');
+
+        /* MASTER RESET: NO SCROLLBARS */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; 
+            background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 70%);
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Helper to hide elements */
+        .hidden-force {
+            display: none !important;
+        }
+
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5); 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 4px;
+        }
+
+        /* --- Atomic Cell Styling --- */
+        
+        /* CSS Variable for Dynamic Scaling */
+        :root {
+            --table-scale-factor: 1;
+        }
+
+        .truth-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: auto; 
+            margin: 0 auto; 
+        }
+
+        /* Base Cell */
+        .truth-table td {
+            font-family: 'JetBrains Mono', monospace;
+            padding: calc(0.5rem * var(--table-scale-factor)); 
+            border: 2px solid #334155;
+            text-align: center;
+            height: calc(5rem * var(--table-scale-factor)); 
+            min-width: calc(8rem * var(--table-scale-factor)); 
+            transition: background-color 0.15s ease;
+            position: relative;
+            box-sizing: border-box; 
+        }
+
+        /* Headers */
+        .truth-table th {
+            font-family: 'JetBrains Mono', monospace;
+            padding: calc(1rem * var(--table-scale-factor)) calc(1.5rem * var(--table-scale-factor)); 
+            background-color: #0f172a;
+            border: 2px solid #334155;
+            color: #ffffff; 
+            font-size: calc(1.75rem * var(--table-scale-factor)); 
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.2); 
+            min-width: calc(8rem * var(--table-scale-factor));
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+
+        .truth-table tbody td.interactive-cell:hover {
+            background-color: rgba(51, 65, 85, 0.5);
+            border-color: #475569;
+        }
+
+        /* The "Chip" look */
+        .cell-content {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: calc(3.5rem * var(--table-scale-factor));   
+            height: calc(3.5rem * var(--table-scale-factor));  
+            border-radius: calc(0.75rem * var(--table-scale-factor));
+            font-weight: 800;
+            font-size: calc(1.75rem * var(--table-scale-factor));
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+            user-select: none;
+        }
+
+        /* Animation Keyframe for Pop effect */
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-pop {
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Value Styles */
+        .val-true .cell-content {
+            background-color: rgba(34, 197, 94, 0.1); 
+            color: #4ade80; 
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            text-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.1);
+        }
+
+        .val-false .cell-content {
+            background-color: rgba(244, 63, 94, 0.1); 
+            color: #fb7185; 
+            border: 1px solid rgba(251, 113, 133, 0.3);
+            text-shadow: 0 0 8px rgba(251, 113, 133, 0.6);
+            box-shadow: 0 0 10px rgba(251, 113, 133, 0.1);
+        }
+
+        /* NEW: ERROR STYLE for Review Mode */
+        .val-error .cell-content {
+            background-color: rgba(220, 38, 38, 0.25); 
+            color: #ffffff; 
+            border: 2px solid #ef4444;
+            text-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+            transform: scale(1.05);
+        }
+        /* Override base TD for error to make it pop */
+        .truth-table td.val-error-cell {
+            border-color: #ef4444;
+            background-color: rgba(69, 10, 10, 0.3);
+        }
+
+        .val-null .cell-content {
+            background-color: rgba(30, 41, 59, 0.5); 
+            color: #64748b; 
+            border: 1px dashed #475569;
+        }
+        
+        .val-null.interactive-cell:hover .cell-content {
+            background-color: rgba(56, 189, 248, 0.1); 
+            border-color: #38bdf8;
+            color: #38bdf8;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        .static-col { background-color: #0f172a; }
+        .static-col .cell-content { 
+            opacity: 1; 
+            filter: grayscale(0); 
+            color: #fde047; /* Bright Yellow */
+            text-shadow: 0 0 10px rgba(253, 224, 71, 0.4); /* Golden Glow */
+            box-shadow: none; 
+            border-color: transparent; 
+        }
+        .interactive-cell { cursor: pointer; }
+        .interactive-cell:active .cell-content { transform: scale(0.92); }
+        
+        /* --- Layout & Utilities --- */
+        
+        #game-scaler {
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            
+            /* Enforce 16:9 Aspect Ratio Base Size (e.g. 1920x1080) */
+            width: 1920px;
+            height: 1080px;
+            
+            /* Prevent overflow hidden so button can hang out if needed, 
+               but strictly usually we want to contain everything. 
+               Let's use overflow hidden to clip any weirdness, 
+               assuming content fits in 1920x1080. */
+            overflow: visible; 
+        }
+
+        .glass-panel {
+            /* Reset width/height constraints to be relative to the fixed scaler */
+            /* Or keep them fixed pixel values if designed for 1920x1080 */
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            overflow: visible; 
+            display: flex;
+            flex-direction: column;
+            
+            /* Increased sizes for 1920x1080 base */
+            width: 1400px;  
+            min-height: 800px; 
+        }
+
+        .formula-box {
+            font-family: 'JetBrains Mono', monospace;
+            background: #020617;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            min-height: 6rem; /* Scaled up */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .formula-box::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.5), transparent);
+        }
+
+        /* UPDATED: .nav-btn
+           Using a lighter, matte grey (Slate/Gray mix) to avoid the "bluish" tint 
+           but also avoiding the heavy dark grey.
+        */
+        .nav-btn {
+            background-image: linear-gradient(to bottom, #334155, #1e293b); /* Reverted to original dark blue-grey */
+            border: 1px solid #475569; /* Reverted to original border color */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+            font-size: 1.2rem; /* Scaled up */
+            padding: 0.75rem 1.5rem; /* Scaled up */
+            min-width: 8rem; /* Scaled up */
+            justify-content: center;
+        }
+        
+        .nav-btn:hover:not(:disabled) {
+            border-color: #38bdf8; /* Cyan border on hover */
+            transform: translateY(-2px); /* Movement on hover */
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); /* Cyan Glow on hover */
+            color: #fff;
+        }
+
+        /* SPECIFIC DISABLED STATE: "Like you can't click it" */
+        .nav-btn:disabled {
+            opacity: 0.4;                 /* Faded out */
+            cursor: not-allowed;          /* No hand cursor */
+            filter: grayscale(100%);      /* Remove any remaining color */
+            background-image: none;       /* Flat background */
+            background-color: #262626;    /* Dark base */
+            border-color: #404040;        /* Dark border */
+            color: #525252;               /* Dimmed text */
+            box-shadow: none;             /* No depth */
+            transform: none !important;   /* No movement */
+        }
+        
+        /* Submit Button Specifics - Updated scaling */
+        .submit-btn {
+             /* ... existing bg ... */
+             font-size: 1.5rem; /* Explicitly set for submit - Increased size */
+        }
+        .submit-btn:active:not(:disabled) {
+            /* Removed transform property */
+        }
+        .submit-btn:not(:disabled) {
+            animation: pulse 2s infinite;
+        }
+        
+        /* ... existing progress track ... */
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(16, 185, 129, 0.7); /* Tailwind green-500 */
+            }
+            70% {
+                transform: scale(1.02);
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); /* Reduced spread radius */
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+    </style>
+</head>
+<body class="text-slate-100">
+
+    <!-- SCALING WRAPPER -->
+    <div id="game-scaler">
+        
+        <!-- THANK YOU SCREEN -->
+        <div id="thank-you-screen" class="glass-panel rounded-3xl p-10 shadow-2xl relative items-center justify-center hidden-force text-center">
+            <h1 class="text-7xl md:text-8xl font-extrabold tracking-tight text-white mb-8 drop-shadow-[0_0_25px_rgba(255,255,255,0.4)]">
+                Thank You!
+            </h1>
+            <p class="text-slate-300 text-3xl mb-10">
+                You have completed the test.
+            </p>
+            <button id="refresh-results-btn" class="nav-btn rounded-xl text-slate-200 flex items-center justify-center gap-3 mt-6">
+                View the Results
+            </button>
+        </div>
+
+        <!-- Main Game Container -->
+        <div id="game-container" class="glass-panel rounded-3xl p-10 shadow-2xl relative">
+            
+            <!-- Decorative bg glow -->
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-2 bg-cyan-500/20 blur-xl"></div>
+
+            <!-- Header Section -->
+            <header class="text-center mb-8 relative z-10">
+                <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                    Truth Table Challenge
+                </h1>
+                <p class="text-slate-400 max-w-4xl mx-auto text-xl leading-relaxed">
+                    Fill in the truth values for every cell. 
+                    <span class="text-slate-500">Click to toggle</span> 
+                    <span class="font-bold text-emerald-400" style="text-shadow: 0 0 10px rgba(52, 211, 153, 0.4)">T</span> <span class="text-slate-500">/</span> <span class="font-bold text-rose-400" style="text-shadow: 0 0 10px rgba(251, 113, 133, 0.4)">F</span>.
+                </p>
+                <p id="instruction-text" class="text-slate-400 max-w-4xl mx-auto text-xl leading-relaxed mt-2">
+                    Click <span class="font-bold text-white">SUBMIT</span> to record your answer.
+                </p>
+            </header>
+
+            <!-- Stats & Controls Bar -->
+            <div class="flex flex-col justify-center items-center bg-slate-800/40 rounded-2xl p-5 mb-8 border border-slate-700/50 backdrop-blur-sm shrink-0 min-w-[800px]">                
+                
+                <!-- Global Score -->
+                <div id="global-score-container" class="score text-2xl font-semibold text-slate-200 mb-4 text-center hidden-force">
+                    Global Score: <span id="score-text" class="text-slate-500 font-mono">0%</span>
+                </div>
+                
+                <!-- Navigation -->
+                     <div class="flex items-center gap-6">
+                        <button id="prev-btn" class="nav-btn rounded-xl text-slate-200 flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+                        Prev
+                    </button>
+                    
+                    <!-- Progress Indicator -->
+                    <div class="flex flex-col items-center w-48">
+                        <div class="w-full text-center font-mono text-lg text-cyan-400 mb-2 whitespace-nowrap">
+                            PROBLEM <span id="problem-num" class="text-white font-bold mx-1">1</span> / <span id="problem-total">10</span>
+                        </div>
+                        <div class="progress-track h-2 rounded-full">
+                            <div id="progress-bar-fill" class="progress-fill rounded-full"></div>
+                        </div>
+                    </div>
+
+                    <button id="next-btn" class="nav-btn rounded-xl text-slate-200 flex items-center gap-3" disabled>
+                        Next
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        
+            <!-- WFF Display -->
+            <div class="flex justify-center mb-8 shrink-0">
+                    <div id="wff-display" class="formula-box px-10 py-5 rounded-2xl text-4xl text-cyan-300 tracking-wide text-center w-full md:w-auto shadow-2xl uppercase">                    <!-- WFF inserted by JS -->
+                </div>
+            </div>
+        
+            <!-- Tables Container Wrapper for Dynamic Scaling -->
+            <div id="tables-container-wrapper" class="flex flex-col space-y-6 w-full">
+                <div class="w-full overflow-x-visible pb-4 flex justify-center">
+                    <table id="truth-table-1" class="truth-table">
+                        <thead id="table-header-1"></thead>
+                        <tbody id="table-body-1"></tbody>
+                    </table>
+                </div>
+                
+                <div id="table-container-2" class="overflow-x-visible pb-4 flex justify-center rounded-2xl border border-slate-700 shadow-xl bg-slate-900/80 hidden">
+                    <table id="truth-table-2" class="truth-table">
+                        <thead id="table-header-2"></thead>
+                        <tbody id="table-body-2"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Submit All Button Container -->
+            <!-- Wrapped in full width flex container for perfect centering -->
+            <div class="absolute -bottom-12 left-0 w-full flex justify-center z-50 pointer-events-none">
+                <button id="submit-all-btn" class="submit-btn px-8 rounded-2xl text-xl font-bold text-white flex items-center gap-3 shadow-2xl hidden-force whitespace-nowrap pointer-events-auto">
+                    Submit
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        // ==========================================
+        // AUTO-SCALING LOGIC (Fixed 16:9) & DYNAMIC FONT SCALING
+        // ==========================================
+        function fitToScreen() {
+            const scaler = document.getElementById('game-scaler');
+            const tablesWrapper = document.getElementById('tables-container-wrapper');
+
+            // Desired Base Dimensions - Adjusted to make content appear slightly larger
+            const baseWidth = 2000; // Was 2200
+            const baseHeight = 1125;  // Was 1238 (approx 16:9)
+            
+            // Available Window Dimensions
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            // Calculate scale factor for the overall game-scaler
+            const scaleX = windowWidth / baseWidth;
+            const scaleY = windowHeight / baseHeight;
+            const overallScale = Math.min(scaleX, scaleY);
+            
+            // Apply overall scale to the game-scaler
+            scaler.style.transform = `translate(-50%, -50%) scale(${overallScale})`;
+
+            // --- DYNAMIC FONT SCALING FOR TABLES ---
+            // This needs to happen *after* the overall scaling, but measure with natural size first
+            // Temporarily reset overall scale to measure tables in their "natural" size
+            scaler.style.transform = `translate(-50%, -50%) scale(1)`; 
+            
+            // Reset table-specific scale factor first to get true intrinsic size
+            document.documentElement.style.setProperty('--table-scale-factor', '1');
+
+            if (tablesWrapper) {
+                // Approximate available width for tables inside glass-panel
+                // Adjusted for new base size
+                const availableTableWidth = 1350; // Was 1500 
+
+                // Measure the actual rendered width of the tables
+                // We need to measure after the overall scale is temporarily removed for correct intrinsic width
+                let totalTablesActualWidth = 0;
+                const table1 = document.getElementById('truth-table-1');
+                const table2Container = document.getElementById('table-container-2'); // This is the div wrapper
+                const table2 = document.getElementById('truth-table-2');
+
+                if (table1) {
+                    totalTablesActualWidth += table1.offsetWidth;
+                }
+                if (table2 && table2Container && !table2Container.classList.contains('hidden')) {
+                    totalTablesActualWidth += table2.offsetWidth; // width of table2
+                    totalTablesActualWidth += 40; // Add space between tables (flex gap)
+                }
+
+                if (totalTablesActualWidth > availableTableWidth) {
+                    const tableScaleFactor = availableTableWidth / totalTablesActualWidth;
+                    document.documentElement.style.setProperty('--table-scale-factor', tableScaleFactor.toFixed(3));
+                }
+            }
+            
+            // Re-apply the overall scale after table-specific scaling is done
+            scaler.style.transform = `translate(-50%, -50%) scale(${overallScale})`;
+        }
+        
+        // ==========================================
+        // SBUFramer Integration Code
+        // ==========================================
+        const CanvasGame = {};
+
+        CanvasGame.notifyParent = (action, payload = {}) => {
+            if (window.parent) {
+                try {
+                    const message = {
+                        source: 'gemini-canvas-game',
+                        action: action,
+                        data: payload
+                    };
+                    window.parent.postMessage(message, '*');
+                } catch (error) {
+                    console.error('Error sending message to parent:', error);
+                }
+            }
+        };
+
+        CanvasGame.save = (data) => {
+            CanvasGame.notifyParent('save_state', data);
+        };
+
+        CanvasGame.requestLoad = () => {
+            CanvasGame.notifyParent('load_state');
+        };
+
+        CanvasGame.onLoad = (callback) => {
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.source === 'gemini-canvas-parent' && event.data.action === 'load_state_response') {
+                    callback(event.data.data);
+                }
+            });
+        };
+
+        // ==========================================
+        // Game Logic
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const problemSet = [
+                // '~ p v ~ q',                            // 1.
+                '~ p v q',                            // 2.
+                // 'p -> ~ q',                             // 3.
+                // '~ p ^ p',                              // 4.
+                // '~ p -> ~ ~ q',                         // 5.
+                // 'q -> ~ ~ p',                           // 6.
+                // '(p -> ~ q) v (p -> q)',                // 7.
+                // '~ p v q',                            // 2.
+                '(q -> ~ p) ^ (p -> q)',                  // 8.
+                // '((~ p -> q) v (~ p -> q)) -> q',        // 9.
+                // '(~ p -> q) -> ((~ p -> q) v (p -> ~ q))' // 10.
+            ];
+
+            const pValues = [true, true, false, false];
+            const qValues = [true, false, true, false];
+            
+            let globalUserState = {}; 
+            let globalSolutions = {};
+            let isSubmitted = false; 
+            let currentProblemSubmitted = false;
+            let problemSubmissionStatus = {}; 
+
+            let solutions = {};
+            let connectiveNames = [];
+            let totalCols = 0;
+            let userState = {}; 
+            let currentProblemIndex = 0;
+            
+            // DOM Elements
+            const gameContainer = document.getElementById('game-container');
+            const thankYouScreen = document.getElementById('thank-you-screen');
+            const globalScoreContainer = document.getElementById('global-score-container');
+            // const scorePlaceholder = document.getElementById('score-placeholder'); // REMOVED
+            const scoreText = document.getElementById('score-text');
+            const instructionText = document.getElementById('instruction-text');
+            
+            const header1 = document.getElementById('table-header-1');
+            const body1 = document.getElementById('table-body-1');
+            const tableContainer2 = document.getElementById('table-container-2');
+            const header2 = document.getElementById('table-header-2');
+            const body2 = document.getElementById('table-body-2');
+            const wffDisplay = document.getElementById('wff-display');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const submitAllBtn = document.getElementById('submit-all-btn'); // NEW BTN
+            const problemNumSpan = document.getElementById('problem-num');
+            const problemTotalSpan = document.getElementById('problem-total');
+            const progressBarFill = document.getElementById('progress-bar-fill');
+
+            problemTotalSpan.textContent = problemSet.length;
+
+            function parseConstituents(wff) {
+                const subExpressions = new Set();
+                const atoms = wff.match(/~*\s*[pq]/g) || [];
+                
+                atoms.forEach(a => subExpressions.add(a.replace(/ /g, '')));
+
+                const stack = [];
+                for (let i = 0; i < wff.length; i++) {
+                    if (wff[i] === '(') {
+                        stack.push(i);
+                    } else if (wff[i] === ')') {
+                        if (stack.length > 0) {
+                            const start = stack.pop();
+                            const sub = wff.substring(start, i + 1).replace(/ /g, '');
+                            subExpressions.add(sub);
+                        }
+                    }
+                }
+                
+                subExpressions.add(wff.replace(/ /g, ''));
+                const allSubExpressions = Array.from(subExpressions);
+                return allSubExpressions.sort((a, b) => a.length - b.length);
+            }
+
+            function evaluateWFF(wff, p, q) {
+                let expr = wff;
+                expr = expr.replace(/p/g, p);
+                expr = expr.replace(/q/g, q);
+                expr = expr.replace(/~/g, '!'); 
+                expr = expr.replace(/v/g, '||'); 
+                expr = expr.replace(/\^/g, '&&'); 
+                expr = expr.replace(/<->/g, '==='); 
+                expr = expr.replace(/->/g, '<='); 
+                
+                try {
+                    return eval(expr);
+                } catch (e) {
+                    console.error('Error evaluating WFF:', wff, e);
+                    return false; 
+                }
+            }
+            
+            function formatLogicalSymbols(text) {
+                if (!text) return text;
+                return text
+                    .replace(/~/g, '¬')
+                    .replace(/v/g, '∨')
+                    .replace(/\^/g, '∧')
+                    .replace(/->/g, '→')
+                    .replace(/<->/g, '↔');
+            }
+
+            function calculateSolutions(names) {
+                const sol = {};
+                names.forEach(name => {
+                    sol[name] = [];
+                    for (let i = 0; i < 4; i++) {
+                        const truthValue = evaluateWFF(name, pValues[i], qValues[i]);
+                        sol[name].push(truthValue);
+                    }
+                });
+                return sol;
+            }
+            
+            async function loadGameConfig() {
+                solutions = {};
+                connectiveNames = [];
+                userState = {};
+                
+                let problemNum = parseInt(window.location.hash.substring(1), 10);
+                if (isNaN(problemNum) || problemNum < 1 || problemNum > problemSet.length) {
+                    problemNum = 1;
+                }
+                currentProblemIndex = problemNum - 1;
+                
+                problemNumSpan.textContent = problemNum;
+                // Update Progress Bar
+                const progressPct = ((currentProblemIndex + 1) / problemSet.length) * 100;
+                progressBarFill.style.width = `${progressPct}%`;
+
+
+                prevBtn.disabled = (problemNum === 1);
+                
+                // Logic for Next/Submit buttons comes later in checkCompletion
+
+                const wffString = problemSet[currentProblemIndex];
+                
+                wffDisplay.innerHTML = formatLogicalSymbols(wffString);
+                
+                connectiveNames = parseConstituents(wffString);
+                connectiveNames = connectiveNames.filter(name => name !== 'p' && name !== 'q');
+                totalCols = connectiveNames.length;
+                
+                solutions = calculateSolutions(connectiveNames);
+                globalSolutions[currentProblemIndex] = solutions;
+                
+                if (!globalUserState[currentProblemIndex]) {
+                    const initialState = {};
+                    connectiveNames.forEach(name => {
+                        initialState[name] = [null, null, null, null];
+                    });
+                    globalUserState[currentProblemIndex] = initialState;
+                }
+                userState = globalUserState[currentProblemIndex];
+                
+                // Restore local submission state for this specific problem
+                if (isSubmitted) {
+                    currentProblemSubmitted = true; 
+                } else {
+                    // Check if this specific problem was previously submitted
+                    currentProblemSubmitted = (problemSubmissionStatus && problemSubmissionStatus[currentProblemIndex]) || false;
+                }
+
+                const MAX_INTERACTIVE_COLS_ONE_TABLE = 20; 
+                let connectiveNames1 = [];
+                let connectiveNames2 = [];
+
+                if (totalCols <= MAX_INTERACTIVE_COLS_ONE_TABLE) {
+                    connectiveNames1 = connectiveNames;
+                } else {
+                    const splitPoint = Math.ceil(totalCols / 2);
+                    connectiveNames1 = connectiveNames.slice(0, splitPoint);
+                    connectiveNames2 = connectiveNames.slice(splitPoint);
+                }
+                
+                return { connectiveNames1, connectiveNames2 };
+            }
+
+            async function init() {
+                const { connectiveNames1, connectiveNames2 } = await loadGameConfig();
+                
+                // Determine Mode
+                if (isSubmitted) {
+                    // Review Mode Styling
+                    instructionText.innerHTML = '<span class="text-rose-400 font-bold">REVIEW MODE</span>: Incorrect answers are marked in <span class="font-bold text-rose-500">RED</span>.';
+                    globalScoreContainer.classList.remove('hidden-force');
+                    
+                    // scorePlaceholder removed, no action needed
+                    
+                    submitAllBtn.classList.add('hidden-force');
+                } else {
+                    // Play Mode Styling
+                    instructionText.innerHTML = 'Click <span class="font-bold text-white">SUBMIT</span> to record your answer.';
+                    globalScoreContainer.classList.add('hidden-force');
+                    // scorePlaceholder removed, no action needed
+                }
+
+                renderTable(header1, body1, connectiveNames1, true); 
+                
+                if (connectiveNames2 && connectiveNames2.length > 0) {
+                    renderTable(header2, body2, connectiveNames2, false);
+                    tableContainer2.classList.remove('hidden');
+                } else {
+                    tableContainer2.classList.add('hidden');
+                }
+                
+                checkCompletion();
+                updateGlobalScore(); // Always calc score, visibility controlled by CSS
+                
+                // Delay slightly to allow DOM to settle before measuring
+                setTimeout(fitToScreen, 50);
+            }
+
+            function renderTable(tableHeader, tableBody, names, includePQ) {
+                tableHeader.innerHTML = '';
+                tableBody.innerHTML = '';
+                
+                const headerRow = document.createElement('tr');
+                if (includePQ) {
+                    headerRow.appendChild(createHeaderCell('P'));
+                    headerRow.appendChild(createHeaderCell('Q'));
+                }
+                
+                names.forEach(name => {
+                    headerRow.appendChild(createHeaderCell(name, true));
+                });
+                tableHeader.appendChild(headerRow);
+                
+                for (let i = 0; i < 4; i++) {
+                    const row = document.createElement('tr');
+                    
+                    if (includePQ) {
+                        row.appendChild(createStaticCell(pValues[i]));
+                        row.appendChild(createStaticCell(qValues[i]));
+                    }
+                    
+                    names.forEach(name => {
+                        row.appendChild(createInteractiveCell(name, i));
+                    });
+                    
+                    tableBody.appendChild(row);
+                }
+            }
+
+            function createHeaderCell(text, isConnective = false) {
+                const th = document.createElement('th');
+                th.scope = 'col';
+                th.textContent = formatLogicalSymbols(text);
+                return th;
+            }
+
+            function createStaticCell(value) {
+                const td = document.createElement('td');
+                td.className = value ? 'val-true static-col' : 'val-false static-col';
+                // Inner content wrapper for styling
+                const span = document.createElement('span');
+                span.className = 'cell-content';
+                span.textContent = value ? 'T' : 'F';
+                td.appendChild(span);
+                return td;
+            }
+
+            function createInteractiveCell(connectiveName, rowIndex) {
+                const td = document.createElement('td');
+                const currentValue = userState[connectiveName][rowIndex];
+                
+                const span = document.createElement('span');
+                span.className = 'cell-content';
+
+                // --- REVIEW MODE LOGIC ---
+                // Trigger if GLOBAL submitted OR LOCAL problem submitted
+                if (isSubmitted || currentProblemSubmitted) {
+                    const correctValue = solutions[connectiveName][rowIndex];
+                    const isCorrect = (currentValue === correctValue);
+                    
+                    // Style
+                    if (currentValue === null) {
+                        span.textContent = '?';
+                        td.className = 'val-null interactive-cell cursor-default';
+                    } else {
+                        span.textContent = currentValue ? 'T' : 'F';
+                        if (isCorrect) {
+                             // Standard coloring for correct
+                            td.className = (currentValue ? 'val-true' : 'val-false') + ' interactive-cell cursor-default';
+                        } else {
+                            // RED ERROR for incorrect
+                            td.className = 'val-error val-error-cell interactive-cell cursor-default';
+                        }
+                    }
+                    // No Click Listener in Review Mode (Global or Local)
+                } 
+                // --- PLAY MODE LOGIC ---
+                else {
+                    if (currentValue !== null) {
+                        span.classList.add('animate-pop');
+                    }
+
+                    if (currentValue === null) {
+                        span.textContent = '?';
+                        td.className = 'val-null interactive-cell';
+                    } else {
+                        span.textContent = currentValue ? 'T' : 'F';
+                        td.className = (currentValue ? 'val-true' : 'val-false') + ' interactive-cell';
+                    }
+                    
+                    // Attach Click Listener
+                    td.dataset.connective = connectiveName;
+                    td.dataset.row = rowIndex;
+                    td.addEventListener('click', handleCellClick);
+                }
+                
+                td.appendChild(span);
+                return td;
+            }
+            
+            function handleCellClick(e) {
+                if (isSubmitted || currentProblemSubmitted) return; // Prevent clicks if globally or locally submitted
+
+                const cell = e.currentTarget; 
+                const connectiveName = cell.dataset.connective;
+                const rowIndex = parseInt(cell.dataset.row, 10);
+                
+                const currentVal = userState[connectiveName][rowIndex];
+                
+                let newValue;
+                if (currentVal === null) {
+                    newValue = true;
+                } else {
+                    newValue = !currentVal;
+                }
+                
+                userState[connectiveName][rowIndex] = newValue;
+                
+                const span = cell.querySelector('.cell-content');
+                span.textContent = newValue ? 'T' : 'F';
+                
+                span.classList.remove('animate-pop');
+                void span.offsetWidth; // trigger reflow
+                span.classList.add('animate-pop');
+
+                cell.className = (newValue ? 'val-true' : 'val-false') + ' interactive-cell';
+                
+                checkCompletion();
+                updateGlobalScore();
+                saveState();
+            }
+
+            async function saveState() {
+                // Update current problem status in the map before saving
+                problemSubmissionStatus[currentProblemIndex] = currentProblemSubmitted;
+
+                CanvasGame.save({ 
+                    globalUserState: globalUserState,
+                    isSubmitted: isSubmitted,
+                    problemSubmissionStatus: problemSubmissionStatus
+                });
+            }
+
+            function checkCompletion() {
+                if (isSubmitted) {
+                    // Global Review Mode
+                    prevBtn.classList.remove('hidden-force');
+                    nextBtn.classList.remove('hidden-force');
+                    prevBtn.disabled = (currentProblemIndex === 0);
+                    nextBtn.disabled = (currentProblemIndex === problemSet.length - 1);
+                    submitAllBtn.classList.add('hidden-force'); 
+                    return;
+                }
+
+                let allFilled = true;
+                connectiveNames.forEach(name => {
+                    const col = userState[name];
+                    if (col.includes(null)) {
+                        allFilled = false;
+                    }
+                });
+                
+                const isFirstProblem = (currentProblemIndex === 0);
+                const isLastProblem = (currentProblemIndex === problemSet.length - 1);
+                
+                // Prev Button
+                if (isFirstProblem) {
+                    prevBtn.classList.add('hidden-force');
+                } else {
+                    prevBtn.classList.remove('hidden-force');
+                    prevBtn.disabled = false;
+                }
+
+                // Next Button
+                if (isLastProblem) {
+                   nextBtn.classList.add('hidden-force');
+                } else {
+                   nextBtn.classList.remove('hidden-force');
+                   // Next button enabled only if ALL cells filled AND current problem submitted
+                   nextBtn.disabled = !(allFilled && currentProblemSubmitted);
+                }
+
+                // Submit Button Logic
+                // Show Submit if not locally submitted yet.
+                // It should be disabled if not all filled.
+                if (!currentProblemSubmitted) {
+                    submitAllBtn.classList.remove('hidden-force');
+                    submitAllBtn.disabled = !allFilled;
+                } else {
+                    // If locally submitted:
+                    // Hide the submit button as the user has already checked their answers.
+                    submitAllBtn.classList.add('hidden-force');
+                }
+            }
+
+            // SUBMIT LOGIC
+            submitAllBtn.addEventListener('click', () => {
+                // 1. Mark current problem as submitted locally
+                currentProblemSubmitted = true;
+                
+                // Update the status map immediately
+                if (!problemSubmissionStatus) problemSubmissionStatus = {};
+                problemSubmissionStatus[currentProblemIndex] = true;
+                
+                // 2. Re-render to show Red/Green feedback immediately
+                // (init calls renderTable, which calls createInteractiveCell, which uses currentProblemSubmitted)
+                // We also want to update buttons via checkCompletion
+                
+                // Force re-render of table to apply disabled/color styles
+                init(); 
+
+                // 3. Check if this is the last problem
+                const isLastProblem = (currentProblemIndex === problemSet.length - 1);
+
+                if (isLastProblem) {
+                    // Only on the last problem do we do the full "Global Submit" flow
+                    isSubmitted = true;
+                    saveState();
+                    
+                    // Switch Screens
+                    gameContainer.classList.add('hidden-force');
+                    thankYouScreen.classList.remove('hidden-force');
+                    
+                    // Re-trigger scale to fit the Thank You screen
+                    setTimeout(fitToScreen, 50);
+
+                    // Add event listener for the new refresh button
+                    document.getElementById('refresh-results-btn').addEventListener('click', () => {
+                        location.reload();
+                    });
+                } else {
+                    // For problems 1-9, we stay on the same page but show feedback.
+                    // User can then click Next.
+                    // We don't toggle isSubmitted global flag.
+                    saveState(); 
+                }
+            });
+
+            function updateGlobalScore() {
+                // Grading Logic: "All or Nothing" per table.
+                // Each table is worth 2 points. Total max score = Total Problems * 2.
+                
+                let totalCorrectProblems = 0;
+                const pointsPerProblem = 2;
+                const totalProblems = problemSet.length;
+                const maxScore = totalProblems * pointsPerProblem;
+
+                // Iterate through all problems in problemSet to get true score
+                problemSet.forEach((wff, pIdx) => {
+                    const uState = globalUserState[pIdx];
+                    
+                    if (uState) {
+                         // We need solution for this specific pIdx. 
+                         let sol = globalSolutions[pIdx];
+                         if (!sol) {
+                             // Calc temporarily if not already cached
+                             const tempNames = parseConstituents(wff).filter(n => n !== 'p' && n !== 'q');
+                             sol = calculateSolutions(tempNames);
+                         }
+
+                         let isTableCorrect = true;
+                         let hasAnyNull = false;
+
+                         Object.keys(uState).forEach(colName => {
+                            const userCol = uState[colName];
+                            const solCol = sol[colName];
+                            
+                            if (solCol) {
+                                userCol.forEach((val, idx) => {
+                                    if (val === null) {
+                                        hasAnyNull = true;
+                                        isTableCorrect = false;
+                                    } else if (val !== solCol[idx]) {
+                                        isTableCorrect = false;
+                                    }
+                                });
+                            }
+                        });
+                        
+                        // Only award points if the ENTIRE table is filled and correct
+                        if (!hasAnyNull && isTableCorrect) {
+                            totalCorrectProblems++;
+                        }
+                    }
+                });
+
+                let pct = 0;
+                let normalizedScore = 0;
+                let currentScore = totalCorrectProblems * pointsPerProblem;
+
+                if (totalProblems > 0) {
+                    pct = Math.round((currentScore / maxScore) * 100);
+                    normalizedScore = currentScore / maxScore;
+                }
+                
+                scoreText.textContent = `${pct}%`;
+                // Display raw score (X/Y points) optionally, or just keep percentage
+                // keeping percentage format as per original request but calculation logic changed
+                globalScoreContainer.innerHTML = `Global Score: <span class="text-cyan-400 font-bold font-mono">${pct}%</span> <span class="text-sm text-slate-500 ml-2 font-mono">(${currentScore}/${maxScore} pts)</span>`;
+
+                CanvasGame.notifyParent('score_update', { score: normalizedScore });
+            }
+
+            prevBtn.addEventListener('click', () => {
+                if (currentProblemIndex > 0) {
+                    window.location.hash = `#${currentProblemIndex}`; 
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (!nextBtn.disabled && currentProblemIndex < problemSet.length - 1) {
+                    window.location.hash = `#${currentProblemIndex + 2}`; 
+                }
+            });
+
+            window.addEventListener('hashchange', init);
+
+            let stateLoaded = false;
+
+            CanvasGame.onLoad((savedState) => {
+                stateLoaded = true;
+                if (savedState) {
+                    if (savedState.globalUserState) {
+                        console.log("Restoring game state...");
+                        globalUserState = savedState.globalUserState;
+                    }
+                    if (savedState.isSubmitted) {
+                        console.log("Game was submitted.");
+                        isSubmitted = true;
+                    }
+                    if (savedState.problemSubmissionStatus) {
+                        problemSubmissionStatus = savedState.problemSubmissionStatus;
+                    }
+                } else {
+                    console.log("No saved state found. Starting fresh.");
+                }
+                init();
+            });
+
+            CanvasGame.requestLoad();
+
+            setTimeout(() => {
+                if (!stateLoaded) {
+                    console.warn("State load timeout. Starting fresh.");
+                    init();
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

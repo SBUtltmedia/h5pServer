@@ -1,0 +1,49 @@
+{
+    "globalUserState": [
+        {
+            "~p": [
+                true,
+                true,
+                true,
+                true
+            ],
+            "~pvq": [
+                true,
+                true,
+                true,
+                true
+            ]
+        },
+        {
+            "~p": [
+                true,
+                true,
+                true,
+                true
+            ],
+            "(p->q)": [
+                true,
+                true,
+                true,
+                true
+            ],
+            "(q->~p)": [
+                true,
+                true,
+                true,
+                true
+            ],
+            "(q->~p)^(p->q)": [
+                true,
+                true,
+                true,
+                true
+            ]
+        }
+    ],
+    "isSubmitted": true,
+    "problemSubmissionStatus": [
+        true,
+        true
+    ]
+}

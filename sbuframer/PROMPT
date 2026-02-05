@@ -1,0 +1,17 @@
+I envision the app, with this structure, as having two modes: practice mode & assessment mode.
+
+We are very happy with the assessment mode and we want to modify truth-table10.html to add  practice mode. 
+
+In practice mode, when the user clicks Submit, they either get a message (call it “Yay!) telling them everything is correct, 
+or the incorrect truth-value assignments in the table are displayed in red, with the cells illuminated (the current problem number 
+remains active). This gives the user a chance to reflect on what they have gotten wrong and why. The user can then toggle the 
+highlighted wrong values to the correct ones, reclick on Submit. The next button then becomes active (without “Yay”).  
+In practice mode, no record is kept of attempts. But a score is delivered at the end corresponding to the students having completed 
+the exercise.
+
+Modes should be determing by a "&" which will need to be parsed by the game html itself. At this point, we want no changes to the 
+overall SBUFramer architecture. 
+
+
+Throughout the lifetime of the user's experiecne of the game they will need to go between two modes. ANd it would need to behave
+differently, based on the mode=practice or assessment. 

@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Tic-Tac-Toe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+/* -------------------------------------------------------------------------- */
+/* STYLES                                   */
+/* -------------------------------------------------------------------------- */
+#intro-screen {
+    position: absolute;
+    background: black;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    cursor: pointer;
+    padding-top: 2%;
+}
+
+#intro-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.screen {
+    display: none; 
+    background-color: black;
+    position: absolute;
+    overflow: hidden;
+    padding-top: 2%;
+}
+
+body {
+    font-family: 'Special Elite', cursive;
+    text-align: center;
+    margin: 0;
+    min-height: 100vh;
+    background-color: #000000;
+    background-size: 200% 200%;
+    overflow: hidden;
+}
+
+h1 {
+    margin-top: 1.25rem;
+    font-family: 'Special Elite', cursive;
+    font-size: 2.25rem;
+    letter-spacing: 0.125rem;
+    color: white;
+    text-shadow: 0.1875rem 0.1875rem 0.375rem rgba(0,0,0,0.15);
+    font-weight: bold;
+}
+
+.main-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.board {
+    display: flex;
+    justify-content: center;
+    gap: 0.625rem;
+    margin: 1.25rem auto;
+}
+
+.letter-count-container {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 2%;
+    width: 90%;
+    box-sizing: border-box;
+    left: 5%;
+}
+
+.letter-box {
+    display: flex;
+    font-size: 0.7rem;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 0.625rem;
+    min-width: 11%;
+    min-height: 5rem;
+    font-family: 'Special Elite', cursive;
+    font-weight: bold;
+    color: white;
+    box-sizing: border-box;
+}
+
+.letter-title {
+    padding: 0.3rem 0 0.3rem 0;
+    text-align: center;
+}
+
+.letter-grid {
+    padding: 0 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(4, auto);
+    gap: 0.25rem 0.75rem;
+    justify-items: center;
+}
+
+@keyframes blinkText {
+    0%, 100% { color: yellow; opacity: 1; }
+    50% { color: yellow; opacity: 0; }
+}
+  
+.blink {
+    animation: blinkText 1s step-start infinite;
+}
+
+.player-box { background-color: #064d1a; }
+.computer-box { background-color: #6d0b0b; }
+
+.game-status {
+    font-family: 'Special Elite', cursive;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white; 
+    margin: 0.625rem 0;
+}
+
+button {
+    font-family: 'Special Elite', cursive;
+    padding: 0.625rem 1.25rem;
+}
+
+.board.grid-layout {
+    display: grid;
+    grid-template-columns: repeat(3, 5rem);
+    width: fit-content;
+}
+
+.cell {
+    font-family: 'Special Elite', cursive;
+    background: white !important;
+    color: black !important;
+    width: 5rem;
+    height: 5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 0.0625rem solid #ccc;
+    flex-direction: column;
+    position: relative;
+    transition: all 0.3s ease;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.1);
+    flex: 0 0 calc(10% + 1rem);
+    max-width: 5rem;
+    min-width: 3.75rem;
+    height: auto;
+    aspect-ratio: 16 / 9;
+}
+
+.cell:hover:not(.taken-player):not(.taken-computer) {
+    background: #ffffff !important;
+    color: black !important;
+    transform: translateY(-0.5rem);
+    box-shadow: 0 0.9375rem 1.5625rem rgba(0,0,0,0.2), 0 0.3125rem 0.625rem rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.cell.taken-player { background-color: #073509 !important; color: white !important; }
+.cell.taken-computer { background-color: crimson !important; color: white !important; }
+
+.label.player, .label.computer {
+    color: rgb(0, 0, 0) !important;
+    font-weight: bold;
+    text-shadow: -0.03125rem -0.03125rem 0 white, 0.03125rem -0.03125rem 0 white, -0.03125rem 0.03125rem 0 white, 0.0625rem 0.0625rem 0 white, 0 0 0 white;
+}
+
+.cell .label {
+    font-size: 0.75rem;
+    position: absolute;
+    bottom: 0.3125rem;
+}
+
+.phase2-content {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 0.625rem;
+    max-width: 37.5rem;
+    text-align: left;
+}
+
+.isomorphic-cell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 0.375rem;
+}
+
+.isomorphic-cell .main-symbol {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.isomorphic-cell .sub-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 60%;
+    font-size: 0.75rem;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.board.game-over {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.isomorphic-cell:hover:not(.taken-player):not(.taken-computer) {
+    transform: translateY(-0.5rem) rotate(-2deg);
+    box-shadow: 0 0.9375rem 1.5625rem rgba(0,0,0,0.2), 0 0.3125rem 0.625rem rgba(0,0,0,0.1);
+}
+
+.board.grid-layout .cell:hover:not(.taken-player):not(.taken-computer) {
+    transform: translateY(-0.625rem) scale(1.1);
+    box-shadow: 0 0.9375rem 1.5625rem rgba(0,0,0,0.2), 0 0.3125rem 0.625rem rgba(0,0,0,0.1);
+}
+
+.cell {
+    animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.taken-player, .taken-computer {
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.board:not(.game-over) .cell:active:not(.taken-player):not(.taken-computer) {
+    transform: scale(0.95);
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.1);
+}
+
+h1:hover {
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
+}
+
+.reset-button {
+    font-family: 'Special Elite', cursive;
+    font-size: 1.1rem;
+    background: linear-gradient(45deg, #2ff48b, #50a09b);
+    border: none;
+    border-radius: 1.5625rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0.25rem 0.9375rem rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+    color: #000;
+}
+
+.reset-button:hover {
+    transform: translateY(-0.1875rem);
+    box-shadow: 0 0.5rem 1.5625rem rgba(0, 0, 0, 0.3);
+    background: linear-gradient(45deg, #4ECDC4, #FF6B6B);
+}
+
+.reset-button:active {
+    transform: translateY(0.0625rem);
+    box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.2);
+}
+
+.reset-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(45deg);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.reset-button:hover::before {
+    transform: rotate(45deg) translateY(100%);
+}
+
+@keyframes phaseEntrance {
+    0% { transform: translateY(-1.875rem); opacity: 0; letter-spacing: 0.5rem; }
+    50% { transform: translateY(0.3125rem); opacity: 0.7; letter-spacing: 0.25rem; }
+    100% { transform: translateY(0); opacity: 1; letter-spacing: normal; }
+}
+
+#game-mode {
+    opacity: 0;
+    font-size: 1.75rem;
+    margin-bottom: 1.875rem;
+    color: #6cdbe9;
+    text-shadow: 0.125rem 0.125rem 0.25rem rgba(0,0,0,0.1);
+    font-weight: bold;
+    animation: phaseEntrance 1.5s ease-out forwards;
+}
+
+.board.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.xo-cell, .isomorphic-cell .main-symbol {
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    max-width: 25rem;
+    position: relative;
+    color: #000; 
+}
+
+#modal-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+  
+.close-button {
+    position: absolute;
+    top: 0.625rem;
+    right: 0.9375rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #000; 
+}
+</style>
+<script>
+window.addEventListener("resize", resizeWindow);
+
+const ASPECT = 16 / 9; 
+
+// Function to resize the window
+function resizeWindow() {
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+
+    var stageWidth, stageHeight, stageLeft, stageTop;
+    const scale = 0.85;
+
+    if ((w / h) >= ASPECT) {
+        stageHeight = h * scale;
+        stageWidth = ASPECT * stageHeight;
+        stageLeft = (w - stageWidth) / 2;
+        stageTop = (h - stageHeight) / 2;
+    } else {
+        stageWidth = w * scale;
+        stageHeight = (1 / ASPECT) * stageWidth;
+        stageTop = (h - stageHeight) / 2;
+        stageLeft = (w - stageWidth) / 2;
+    }
+
+    var screen = document.querySelector(".screen");
+    if (screen) {
+        screen.style.width = stageWidth + "px";
+        screen.style.height = stageHeight + "px";
+        screen.style.left = stageLeft + "px";
+        screen.style.top = stageTop + "px";
+    }
+
+    var introScreen = document.getElementById("intro-screen");
+    if (introScreen) {
+        introScreen.style.width = stageWidth + "px";
+        introScreen.style.height = stageHeight + "px";
+        introScreen.style.left = stageLeft + "px";
+        introScreen.style.top = stageTop + "px";
+    }
+
+    let scalingFactor = stageHeight/40;
+    document.documentElement.style.fontSize = (scalingFactor) + "px";
+}
+</script>
+
+<script>
+const CanvasGame = {};
+
+/**
+ * Sends a message from the iframe to its parent window.
+ */
+CanvasGame.notifyParent = (action, payload = {}) => {
+    if (window.parent) {
+        try {
+            const message = {
+                source: 'gemini-canvas-game',
+                action: action,
+                data: payload
+            };
+            window.parent.postMessage(message, '*');
+            console.log('Message sent to parent:', message);
+        } catch (error) {
+            console.error('Error sending message to parent:', error);
+        }
+    } else {
+        console.warn('The game is not running in an iframe, cannot communicate with a parent.');
+    }
+};
+
+/**
+ * Save game state object.
+ */
+CanvasGame.save = (data) => {
+    CanvasGame.notifyParent('save_state', data);
+};
+
+/**
+ * Request saved game state.
+ */
+CanvasGame.requestLoad = () => {
+    CanvasGame.notifyParent('load_state');
+};
+
+/**
+ * Register callback for loaded state.
+ */
+CanvasGame.onLoad = (callback) => {
+    window.addEventListener('message', (event) => {
+        if (event.data && event.data.source === 'gemini-canvas-parent' && event.data.action === 'load_state_response') {
+            callback(event.data.data);
+        }
+    });
+};
+</script>
+
+</head>
+<body onload="resizeWindow()">
+    <div id="intro-screen" onclick="hideIntroScreen()">
+        <img src="https://sbutltmedia.github.io/ThinkingMattersExercises/Card_Game/image_background.svg" alt="Intro" id="intro-image">
+    </div>
+
+    <div class="screen">
+    <h1>GAME ISOMORPHISM DISCOVERY</h1>
+    <div id="game-title">
+        <div id="game-mode"></div>
+
+            <div class="letter-count-container">
+                <div id="player-letters" class="letter-box player-box">Your Status</div>
+                <div id="computer-letters" class="letter-box computer-box">Computer's Status</div>
+            </div>
+
+            <div class="board" id="board"></div>
+            <div class="game-status" id="gameStatus"></div>
+            <button class="reset-button" onclick="resetGame(currentPHASE)">Reset GAME</button>
+
+        <div id="instructions-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2 id="modal-title"></h2>
+                <p id="modal-text"></p>
+                <div id="modal-buttons" style="margin-top: 1rem; display: none;">
+                    <button class="reset-button" onclick="handlePlayAgain()">Play Again</button>
+                    <button class="reset-button" onclick="proceedToNextPhase()">Next Phase</button>
+                  </div>
+            </div>
+        </div>
+
+        <div id="audio-container" style="display: none;">
+            <audio id="myAudio" nocontrols autoplay>
+                <source type="audio/ogg" src="https://sbutltmedia.github.io/ThinkingMattersExercises/Card_Game/tts/out/1/phase1.ogg">
+            </audio>
+        </div>
+    
+    </div>
+</div>
+
+<script>
+// Get the current phase from the URL as a fallback
+const urlParams = new URLSearchParams(window.location.search);
+let currentPHASE = 1;
+
+let playerLetterCounts = {};
+let computerLetterCounts = {};
+const TRACKED_LETTERS = ['a', 'd', 'h', 'i', 'n', 'o', 's', 't'];
+
+const phaseInfo = [
+    { 
+        'description': 'Phase 1: Hot (Word Tic-Tac-Toe)', 
+        'instructions': 'Players take turns choosing cards from a set of nine, each containing a word. The objective is to be the first to collect three cards with words that share a common letter from the set {a, d, h, i, n, o, s, t}.' 
+    },
+    { 
+        'description': 'Phase 2: Ace (Number Tic-Tac-Toe)', 
+        'instructions': 'Players take turns choosing cards numbered 1 through 9. The objective is to be the first to collect three cards whose sum equals 15.' 
+    },
+    { 
+        'description': 'Phase 3: Tic-Tac-Toe (Standard Grid)', 
+        'instructions': 'Players take turns placing Xs and Os on a standard 3×3 Tic-Tac-Toe board. The objective is to be the first to get three of your marks in a row - horizontally, vertically or diagonally, while strategically blocking your opponent.' 
+    },
+    { 
+        'description': 'Phase 4: Magic Square (The Isomorphism)', 
+        'instructions': 'This phase combines elements from the previous games. Players must recognize connections between words, numbers and patterns to form winning strategies. The key lies in identifying relationships, such as how three words sharing a common letter in the game "Hot" correspond to a sum of 15 in "Ace". The board shows the isomorphic mapping.' 
+    }
+];
+
+function hideVSCController() {
+    const vscController = document.querySelector('div.vsc-controller');
+    if (vscController && vscController.shadowRoot) {
+      const controller = vscController.shadowRoot.getElementById('controller');
+      if (controller) {
+        controller.style.display = 'none';
+        return;
+      }
+    }
+    requestAnimationFrame(hideVSCController);
+}
+
+function hideIntroScreen() {
+    const introScreen = document.getElementById('intro-screen');
+    if (introScreen) {
+        introScreen.style.display = 'none';
+    }
+    const screen = document.querySelector('.screen');
+    if (screen) {
+        screen.style.display = 'block';
+    }
+    playPhaseIntroAudio();
+    resizeWindow();
+}
+
+/**
+ * UPDATED: Initialization Logic with Save/Load
+ * Uses CanvasGame.onLoad and CanvasGame.requestLoad
+ */
+window.addEventListener('DOMContentLoaded', () => {
+    hideVSCController();
+    
+    let stateLoaded = false;
+    
+    // 1. Define what to do when state is loaded
+    CanvasGame.onLoad((savedState) => {
+        stateLoaded = true;
+        if (savedState && savedState.currentPhase) {
+            console.log("Restoring game state, Phase:", savedState.currentPhase);
+            currentPHASE = parseInt(savedState.currentPhase);
+        } else {
+            console.log("No saved state found or valid phase. Checking URL or Defaulting to 1.");
+            // Fallback to URL param if no save exists
+            currentPHASE = Math.min(urlParams.get('phase') || 1, 4);
+        }
+        
+        initializeGame(currentPHASE);
+    });
+
+    // 2. Request the state from the parent
+    CanvasGame.requestLoad();
+
+    // 3. Fallback if no response (timeout)
+    setTimeout(() => {
+        if (!stateLoaded) {
+            console.warn("State load timeout. Starting fresh.");
+            currentPHASE = Math.min(urlParams.get('phase') || 1, 4);
+            initializeGame(currentPHASE);
+        }
+    }, 500);
+});
+
+// Helper to start the game logic after phase is determined
+function initializeGame(phase) {
+    switchToPhase(phase);
+    resizeWindow();
+    toggleLetterBoxesVisibility(phase);
+}
+
+const targetSum = 15;
+const wordBindings = {
+    2: "hat", 7: "hi", 6: "dough",
+    9: "as", 5: "tides", 1: "so",
+    4: "and", 3: "in", 8: "not",
+};
+let availableNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+let playerNumbers = [];
+let computerNumbers = [];
+const boardElement = document.getElementById('board');
+const gameStatus = document.getElementById('gameStatus');
+let gameEnded = false;
+const userStatus = "YOUR LETTERS";
+const computerStatus = "COMPUTER'S LETTERS";
+
+function playPhaseIntroAudio() {
+    const videoElement = document.getElementById("myAudio");
+    if (!videoElement) return;
+  
+    const sourceElement = videoElement.querySelector("source");  
+    const phaseToUse = currentPHASE;
+  
+    sourceElement.src = `https://sbutltmedia.github.io/ThinkingMattersExercises/Card_Game/tts/out/${phaseToUse}/phase${phaseToUse}.ogg`;
+  
+    videoElement.load();
+    videoElement.play().catch(e => console.error("Audio playback failed:", e));
+}
+
+function createBoard(phase) {
+    boardElement.innerHTML = '';
+    boardElement.classList.toggle('grid-layout', phase === 3 || phase === 4);
+    
+    const wordOrder = [7, 2, 3, 6, 4, 5, 8, 9, 1]; 
+    const magicSquareOrder = [8, 1, 6, 3, 5, 7, 4, 9, 2]; 
+
+    const displayOrder = (phase === 1) ? wordOrder : magicSquareOrder; 
+
+    displayOrder.forEach((num, index) => {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.number = num;
+        cell.dataset.index = index; 
+        
+        switch(phase) {
+            case 1:
+                cell.textContent = wordBindings[num];
+                break;
+            case 2:
+                cell.textContent = num;
+                break;
+            case 3:
+                cell.classList.add('xo-cell');
+                break;
+            case 4:
+                cell.classList.add('isomorphic-cell');
+                cell.innerHTML = `
+                    <div class="main-symbol"></div>
+                    <div class="sub-info">
+                    <span class="cell-number">(${num})</span>
+                    <span class="cell-word">${wordBindings[num]}</span>
+                    </div>
+                `;
+                break;
+        }
+        cell.addEventListener('click', handlePlayerMove);
+        boardElement.appendChild(cell);
+    });
+}
+
+/**
+ * UPDATED: proceedToNextPhase
+ * 1. Calculates score (0.25 per phase).
+ * 2. Sends score_update to parent.
+ * 3. Saves the NEW phase state so user resumes correctly.
+ */
+function proceedToNextPhase() {
+    // Determine the score for the phase just completed
+    const completedPhase = currentPHASE;
+    
+    // Score update: 0.25, 0.50, 0.75 for completing phases 1, 2, 3 respectively.
+    if (completedPhase >= 1 && completedPhase <= 3) {
+        const score = completedPhase / 4.0; // 0.25, 0.5, 0.75
+        
+        if (typeof CanvasGame !== 'undefined' && CanvasGame.notifyParent) {
+            CanvasGame.notifyParent('score_update', { 
+                score: score, 
+                phase_completed: completedPhase 
+            });
+        }
+    }
+
+    const nextPhase = Math.min(currentPHASE + 1, 4);
+    
+    // SAVE THE NEW STATE
+    if (typeof CanvasGame !== 'undefined' && CanvasGame.save) {
+        console.log("Saving game state, Next Phase:", nextPhase);
+        CanvasGame.save({ currentPhase: nextPhase });
+    }
+
+    document.getElementById('instructions-modal').style.display = 'none';
+    document.getElementById('modal-buttons').style.display = 'none';
+    switchToPhase(nextPhase);
+}
+
+function renderPhase2Combinations(numbers, elementId) {
+    if (currentPHASE === 1 || currentPHASE === 3 || currentPHASE === 4) return;
+
+    const container = document.getElementById(elementId);
+    container.innerHTML = '';
+
+    const title = document.createElement('div');
+    title.className = 'letter-title';
+    title.textContent = elementId === 'player-letters' ? "YOUR SUMS" : "COMPUTER'S SUMS";
+    container.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'letter-grid';
+    grid.style.gridTemplateColumns = '1fr'; 
+    
+    if (numbers.length >= 3) {
+        for (let i = 0; i < numbers.length; i++) {
+            for (let j = i + 1; j < numbers.length; j++) {
+                for (let k = j + 1; k < numbers.length; k++) {
+                    const a = numbers[i], b = numbers[j], c = numbers[k];
+                    const sum = a + b + c;
+                    const row = document.createElement('div');
+                    row.textContent = `${a} + ${b} + ${c} = ${sum}`;
+                    row.classList.toggle('blink', sum === targetSum);
+                    grid.appendChild(row);
+                }
+            }
+        }
+    } else {
+        const row = document.createElement('div');
+        row.textContent = `Need ${3 - numbers.length} more number(s)...`;
+        grid.appendChild(row);
+    }
+    
+    container.appendChild(grid);
+}
+
+function handlePlayerMove(event) {
+    if (gameEnded) return;
+
+    const cell = event.target.closest('.cell');
+    const number = parseInt(cell.dataset.number);
+
+    if (!cell || !availableNumbers.includes(number)) return;
+
+    playerNumbers.push(number);
+
+    if (currentPHASE === 1 || currentPHASE === 4) {
+        updateLetterCounts(wordBindings[number], playerLetterCounts, 'player-letters');
+    } else if (currentPHASE === 2) {
+        renderPhase2Combinations(playerNumbers, 'player-letters');
+    }
+    
+    availableNumbers = availableNumbers.filter(num => num !== number);
+
+    updateCellDisplay(cell, 'player');
+
+    if (checkWinningCombination(playerNumbers)) {
+        showResult("You Win!");
+        endGame();
+        return;
+    }
+
+    if (availableNumbers.length === 0) {
+        showResult("It's a Tie!");
+        endGame();
+        return;
+    }
+
+    gameStatus.textContent = "Computer is thinking...";
+    setTimeout(() => {
+        const bestMove = findBestMove();
+        computerNumbers.push(bestMove);
+
+        if (currentPHASE === 1 || currentPHASE === 4) {
+            updateLetterCounts(wordBindings[bestMove], computerLetterCounts, 'computer-letters');
+        } else if (currentPHASE === 2) {
+            renderPhase2Combinations(computerNumbers, 'computer-letters');
+        }
+
+        availableNumbers = availableNumbers.filter(num => num !== bestMove);
+        const computerCell = document.querySelector(`.cell[data-number="${bestMove}"]`);
+        updateCellDisplay(computerCell, 'computer');
+
+        if (checkWinningCombination(computerNumbers)) {
+            showResult("Computer Wins!");
+            endGame();
+            return;
+        }
+
+        if (availableNumbers.length === 0) {
+            showResult("It's a Tie!");
+            endGame();
+            return;
+        }
+
+        gameStatus.textContent = "Your turn (X)";
+    }, 500); 
+}
+
+function updateCellDisplay(cell, player) {
+    cell.classList.add(`taken-${player}`);
+    cell.classList.remove(`taken-${player === 'player' ? 'computer' : 'player'}`);
+    
+    const symbol = player === 'player' ? 'X' : 'O';
+
+    switch(currentPHASE) {
+        case 1:
+        case 2:
+            const existingLabel = cell.querySelector('.label');
+            if(existingLabel) existingLabel.remove();
+
+            const currentContent = cell.textContent.replace(/player|computer/gi, '').trim();
+            cell.textContent = currentContent;
+            
+            const label = document.createElement('span');
+            label.className = `label ${player}`;
+            label.textContent = symbol; 
+            cell.appendChild(label);
+            break;
+        case 3:
+            cell.textContent = symbol;
+            break;
+        case 4:
+            const mainSymbol = cell.querySelector('.main-symbol');
+            mainSymbol.textContent = symbol;
+            break;
+    }
+    
+    cell.removeEventListener('click', handlePlayerMove);
+}
+
+function checkWinningCombination(numbers) {
+    if (numbers.length < 3) return false;
+    const n = numbers.length;
+    for (let i = 0; i < n; i++) {
+        for (let j = i + 1; j < n; j++) {
+            for (let k = j + 1; k < n; k++) {
+                if (numbers[i] + numbers[j] + numbers[k] === targetSum) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+function toggleLetterBoxesVisibility(phase) {
+    const playerBox = document.getElementById('player-letters');
+    const computerBox = document.getElementById('computer-letters');
+
+    const shouldShow = phase === 1 || phase === 4; 
+    const displayValue = shouldShow ? 'flex' : 'none';
+
+    playerBox.style.display = displayValue;
+    computerBox.style.display = displayValue;
+
+    if (phase === 2) {
+        playerBox.style.display = 'flex';
+        computerBox.style.display = 'flex';
+        renderPhase2Combinations(playerNumbers, 'player-letters');
+        renderPhase2Combinations(computerNumbers, 'computer-letters');
+    }
+}
+
+function updateLetterCounts(word, countObj, elementId) {
+    for (let char of word.toLowerCase()) {
+        if (TRACKED_LETTERS.includes(char)) {
+            countObj[char] = (countObj[char] || 0) + 1;
+        }
+    }
+    renderLetterCounts(countObj, elementId);
+}
+
+function renderLetterCounts(countObj, elementId) {
+    const container = document.getElementById(elementId);
+    container.innerHTML = ''; 
+
+    const title = document.createElement('div');
+    title.className = 'letter-title';
+    title.textContent = elementId === 'player-letters' ? userStatus : computerStatus;
+    container.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'letter-grid';
+
+    for (let letter of TRACKED_LETTERS) {
+        const value = countObj[letter] || 0;
+        const cell = document.createElement('div');
+        cell.className = 'letter-cell';
+        cell.textContent = `${letter}: ${value}`;
+        cell.classList.toggle('blink', value >= 3);
+        grid.appendChild(cell);
+    }
+    container.appendChild(grid);
+}
+
+function evaluate() {
+    if (checkWinningCombination(computerNumbers)) return 10;
+    if (checkWinningCombination(playerNumbers)) return -10;
+    return 0;
+}
+
+function minimax(depth, isMaximizing) {
+    const score = evaluate();
+    if (score === 10 || score === -10 || availableNumbers.length === 0) return score;
+
+    let best = isMaximizing ? -Infinity : Infinity;
+    const currentAvailable = [...availableNumbers]; 
+
+    for (let num of currentAvailable) {
+        availableNumbers = availableNumbers.filter(n => n !== num);
+        if (isMaximizing) {
+            computerNumbers.push(num);
+        } else {
+            playerNumbers.push(num);
+        }
+
+        const currentScore = minimax(depth + 1, !isMaximizing);
+        best = isMaximizing ? Math.max(best, currentScore) : Math.min(best, currentScore);
+
+        if (isMaximizing) {
+            computerNumbers.pop();
+        } else {
+            playerNumbers.pop();
+        }
+        availableNumbers.push(num);
+        availableNumbers.sort((a, b) => a - b);
+    }
+    return best;
+}
+
+function findBestMove() {
+    let bestVal = -Infinity;
+    let bestMove = -1;
+
+    if (availableNumbers.length === 9) {
+        return 5;
+    }
+
+    for (const num of availableNumbers) {
+        const tempComputerNumbers = [...computerNumbers, num];
+        if (checkWinningCombination(tempComputerNumbers)) {
+            return num;
+        }
+    }
+
+    for (const num of availableNumbers) {
+        const tempPlayerNumbers = [...playerNumbers, num];
+        if (checkWinningCombination(tempPlayerNumbers)) {
+            return num;
+        }
+    }
+
+    for (let num of availableNumbers) {
+        computerNumbers.push(num);
+        availableNumbers = availableNumbers.filter(n => n !== num);
+
+        const moveVal = minimax(0, false); 
+
+        availableNumbers.push(num);
+        computerNumbers.pop();
+        availableNumbers.sort((a, b) => a - b);
+
+        if (moveVal > bestVal) {
+            bestVal = moveVal;
+            bestMove = num;
+        }
+    }
+
+    if (bestMove === -1 && availableNumbers.length > 0) {
+        return availableNumbers[0];
+    }
+    return bestMove;
+}
+
+function endGame() {
+    gameEnded = true;
+    boardElement.classList.add('game-over');
+
+    const urlPhase = urlParams.get('phase');
+    if (urlPhase) return; 
+    
+    // Added Final Score Update Logic for Phase 4
+    if (currentPHASE === 4) {
+        // Final completion score (1.0) when the game concludes in the final phase
+        if (typeof CanvasGame !== 'undefined' && CanvasGame.notifyParent) {
+            CanvasGame.notifyParent('game_complete', { 
+                score: 1.0, 
+                phase_completed: 4 
+            });
+            // Also save that they finished Phase 4 (optional but good practice)
+            CanvasGame.save({ currentPhase: 4, completed: true });
+        }
+    }
+
+    if (currentPHASE < 4) {
+        document.querySelector('#modal-buttons button:last-child').style.display = 'inline-block';
+    } else {
+        document.querySelector('#modal-buttons button:last-child').style.display = 'none';
+    }
+}
+
+function switchToPhase(phase) {
+    currentPHASE = parseInt(phase);
+
+    const gameModeElement = document.getElementById('game-mode');
+    const board = document.querySelector('.board');
+    
+    gameModeElement.style.animation = 'none';
+    board.classList.remove('show');
+    
+    void gameModeElement.offsetWidth;
+    
+    gameModeElement.style.animation = 'phaseEntrance 1.5s ease-out forwards';
+    
+    setTimeout(() => {
+        board.classList.add('show');
+    }, 1000);
+
+    gameModeElement.textContent = phaseInfo[currentPHASE - 1].description;
+    
+    resetGame(currentPHASE);
+    toggleLetterBoxesVisibility(currentPHASE);
+    showInstructions(currentPHASE);
+    playPhaseIntroAudio();
+}
+
+function handlePlayAgain() {
+    document.getElementById('instructions-modal').style.display = 'none';
+    document.getElementById('modal-buttons').style.display = 'none';
+    resetGame(currentPHASE);
+}
+
+function showInstructions(phase) {
+    const modal = document.getElementById('instructions-modal');
+    const title = document.getElementById('modal-title');
+    const text = document.getElementById('modal-text');
+    const buttons = document.getElementById('modal-buttons');
+
+    title.textContent = phaseInfo[phase - 1].description;
+    text.textContent = phaseInfo[phase - 1].instructions;
+    buttons.style.display = 'none'; 
+
+    modal.style.display = 'flex';
+
+    document.querySelector('.close-button').onclick = () => {
+        modal.style.display = 'none';
+        
+        const videoElement = document.getElementById("myAudio");
+        const audioContainer = document.getElementById("audio-container");
+        if (videoElement) {
+          videoElement.pause();
+          videoElement.currentTime = 0;
+        }
+        if (audioContainer) {
+          audioContainer.style.display = "none";
+        }
+      };
+}
+
+function showResult(message) {
+    const modal = document.getElementById('instructions-modal');
+    const title = document.getElementById('modal-title');
+    const text = document.getElementById('modal-text');
+    const buttons = document.getElementById('modal-buttons');
+
+    title.textContent = message;
+    text.textContent = "Would you like to play again or move on to the next phase?";
+    buttons.style.display = 'flex';
+
+    if (currentPHASE === 4 || urlParams.has('phase')) {
+        document.querySelector('#modal-buttons button:last-child').style.display = 'none';
+    } else {
+        document.querySelector('#modal-buttons button:last-child').style.display = 'inline-block';
+    }
+
+    modal.style.display = 'flex';
+}
+
+function resetGame(passPhase) {
+    gameEnded = false;
+    
+    playerLetterCounts = {};
+    computerLetterCounts = {};
+    TRACKED_LETTERS.forEach(letter => {
+        playerLetterCounts[letter] = 0;
+        computerLetterCounts[letter] = 0;
+    });
+
+    renderLetterCounts(playerLetterCounts, 'player-letters');
+    renderLetterCounts(computerLetterCounts, 'computer-letters');
+
+    availableNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    playerNumbers = [];
+    computerNumbers = [];
+
+    if (passPhase === 2) {
+        renderPhase2Combinations(playerNumbers, 'player-letters');
+        renderPhase2Combinations(computerNumbers, 'computer-letters');
+    }
+    
+    gameStatus.textContent = "Your turn (X)";
+    boardElement.classList.remove('game-over');
+    createBoard(passPhase);
+}
+</script>
+</body>
+</html>

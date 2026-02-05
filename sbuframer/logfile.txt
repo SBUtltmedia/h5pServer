@@ -1,0 +1,11 @@
+Message sent to parent: 
+{source: 'gemini-canvas-game', action: 'game_complete', data: {…}}
+index.php?game=games/test_cn/:25 Score received from game: 0.85
+grading.js:2 --- GRADING.JS: ATTEMPTING TO FETCH postLTI.php NOW ---
+index.php?game=games/test_cn/:33 Full grading result:  string<br />
+<b>Deprecated</b>:  Creation of dynamic property OAuthConsumer::$callback_url is deprecated in <b>/var/www/html/src/LTI/php/OAuth.php</b> on line <b>22</b><br />
+<?xml version="1.0" encoding="UTF-8"?><imsx_POXEnvelopeResponse xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">  <imsx_POXHeader>    <imsx_POXResponseHeaderInfo>      <imsx_version>V1.0</imsx_version>      <imsx_messageIdentifier>68f807f232935</imsx_messageIdentifier>      <imsx_statusInfo>        <imsx_codeMajor>failure</imsx_codeMajor>        <imsx_severity>status</imsx_severity>        <imsx_description>Invalid consumer key id=jisc.ac.uk secret=secret</imsx_description>        <imsx_messageRefIdentifier></imsx_messageRefIdentifier>      </imsx_statusInfo>    </imsx_POXResponseHeaderInfo>  </imsx_POXHeader>  <imsx_POXBody>      <replaceResultResponse />  </imsx_POXBody></imsx_POXEnvelopeResponse>failure
+
+index.php?game=games/test_cn/:39 LMS submission failed. Response: string<br />
+<b>Deprecated</b>:  Creation of dynamic property OAuthConsumer::$callback_url is deprecated in <b>/var/www/html/src/LTI/php/OAuth.php</b> on line <b>22</b><br />
+<?xml version="1.0" encoding="UTF-8"?><imsx_POXEnvelopeResponse xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">  <imsx_POXHeader>    <imsx_POXResponseHeaderInfo>      <imsx_version>V1.0</imsx_version>      <imsx_messageIdentifier>68f807f232935</imsx_messageIdentifier>      <imsx_statusInfo>        <imsx_codeMajor>failure</imsx_codeMajor>        <imsx_severity>status</imsx_severity>        <imsx_description>Invalid consumer key id=jisc.ac.uk secret=secret</imsx_description>        <imsx_messageRefIdentifier></imsx_messageRefIdentifier>      </imsx_statusInfo>    </imsx_POXResponseHeaderInfo>  </imsx_POXHeader>  <imsx_POXBody>      <replaceResultResponse />  </imsx_POXBody></imsx_POXEnvelopeResponse>failure

@@ -1,0 +1,227 @@
+<div id="id_card_securitymodel_body" class="collapse show" role="tabpanel" aria-labelledby="id_card_securitymodel_heading" data-bs-parent="#id_main">
+                <div class="card-body">
+                  <div class="accordion" id="id_card_securitymodel_tabs" role="tablist">
+                    <div class="row">
+                      <label for="id_lti_version" class="col-sm-3 col-form-label">LTI version:</label>
+                      <div class="col-sm-3 pe-0">
+                        <div class="input-group">
+                          <div class="input-group-text">
+                            <input type="checkbox" class="form-check-input mt-0 " name="c_lti_version" id="id_c_lti_version" value="on" checked="">
+                          </div>
+                          <input type="text" class="form-control form-control-sm required" name="lti_version" id="id_lti_version" value="LTI-1p0" placeholder="Required parameter">
+                        </div>
+                      </div>
+                      <div class="col-sm-2 ps-0">
+                        <select class="form-select form-select-sm" id="id_sel_lti_version" onchange="onSelLTIVersionChange(this);">
+                          <option value="">Select ...</option>
+                          <option value="LTI-1p0">LTI-1p0</option>
+                          <option value="1.3.0">1.3.0</option>
+                          <option value="LTI-2p0">LTI-2p0</option>
+                        </select>
+                      </div>
+                      <div class="col-4">
+                        &nbsp;
+                      </div>
+                      <label for="id_endpoint" class="col-sm-3 col-form-label">Message URL:</label>
+                      <div class="col-sm-9">
+                        <input type="url" class="form-control form-control-sm required" name="endpoint" id="id_endpoint" value="https://apps.tlt.stonybrook.edu/vq/users/glucci/1/" placeholder="Required parameter">
+                      </div>
+                      <label for="id_key" class="col-sm-3 col-form-label">Consumer key:</label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control form-control-sm required" name="key" id="id_key" value="key_NSlctxPORqrIGspICqtDA8UqFvTHcqrxo96XLGgSMdmmnnVBfPXElvFy6" placeholder="Required parameter">
+                      </div>
+                      <label for="id_secret" class="col-sm-3 col-form-label">Shared secret:</label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control form-control-sm required" name="secret" id="id_secret" value="secret_AAAAB3NzaC1yc2EAAAABJQAAAQEAkett8rI9w9NufPDOkB" placeholder="Required parameter">
+                      </div>
+                      <label for="id_signaturemethod" class="col-sm-3 col-form-label">Signature method:</label>
+                      <div class="col-sm-3 pe-0">
+                        <div class="input-group">
+                          <input type="text" class="form-control form-control-sm required" name="signaturemethod" id="id_signaturemethod" onchange="onSignatureMethodChange(this);" value="HMAC-SHA1" placeholder="Required parameter">
+                        </div>
+                      </div>
+                      <div class="col-sm-2 ps-0">
+                        <select class="form-select form-select-sm" id="id_sel_signaturemethod" onchange="onSelSignatureMethodChange(this);">
+                          <option value="">Select ...</option>
+
+                          <optgroup class="required" label="OAuth 1">
+                            <option class="required" value="HMAC-SHA1">HMAC-SHA1</option>
+                            <option class="experimental d-none" value="HMAC-SHA224" title="Experimental feature">HMAC-SHA224</option>
+                            <option class="optional" value="HMAC-SHA256" title="Optional feature">HMAC-SHA256</option>
+                            <option class="extension" value="HMAC-SHA384" title="Unofficial extension feature">HMAC-SHA384</option>
+                            <option class="extension" value="HMAC-SHA512" title="Unofficial extension feature">HMAC-SHA512</option>
+                          </optgroup>
+
+                          <optgroup class="required" label="JWT">
+                            <option class="required" value="RS256">RS256</option>
+                            <option class="extension" value="RS384" title="Unofficial extension feature">RS384</option>
+                            <option class="extension" value="RS512" title="Unofficial extension feature">RS512</option>
+                          </optgroup>
+                        </select>
+                      </div>
+                      <div class="col-sm-4">
+                        &nbsp;
+                      </div>
+                      <label for="id_encryptionmethod" class="col-sm-3 col-form-label d-none">Content encryption method:</label>
+                      <div class="col-sm-4 d-none">
+                        <div class="input-group">
+                          <input type="text" class="form-control form-control-sm experimental" name="encryptionmethod" id="id_encryptionmethod" value="" placeholder="Experimental parameter">
+                          <select class="form-select form-select-sm col-sm-3" id="id_sel_encryptionmethod" onchange="onSelFieldChange(this);">
+                            <option value="">Select ...</option>
+                            <option value="">None</option>
+                            <option value="A128CBC-HS256">A128CBC-HS256</option>
+                            <option value="A192CBC-HS384">A192CBC-HS384</option>
+                            <option value="A256CBC-HS512">A256CBC-HS512</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-sm-5 d-none">
+                        &nbsp;
+                      </div>
+                      <label for="id_c_messagehint" class="col-sm-3 col-form-label d-none">Message hint:</label>
+                      <div class="col-sm-9 d-none">
+                        <div class="input-group">
+                          <div class="input-group-text">
+                            <input type="checkbox" class="form-check-input mt-0 " name="c_messagehint" id="id_c_messagehint" value="on" checked="">
+                          </div>
+                          <input type="text" class="form-control form-control-sm required" name="messagehint" id="id_messagehint" value="My LTI message hint!" placeholder="Required parameter">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="accordion-item mt-2 mb-2 d-none">
+                      <div class="accordion-header" role="tab" id="id_securitymodel_platform_heading">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#id_card_securitymodel_platform" aria-expanded="true" aria-controls="id_card_securitymodel_platform">Platform Details</button>
+                      </div>
+                      <div id="id_card_securitymodel_platform" class="accordion-collapse collapse show" role="tabpanel" aria-labelledby="id_securitymodel_platform_heading">
+                        <div class="accordion-body pb-0 mb-0">
+                          <div class="row">
+                            <label for="id_platformid" class="col-sm-3 col-form-label">Platform/Issuer ID:</label>
+                            <div class="col-sm-9">
+                              <input type="text" class="form-control form-control-sm required info" name="platformid" id="id_platformid" value="https://saltire.lti.app/platform" placeholder="Parameter to be shared with tool">
+                            </div>
+                            <label for="id_clientid" class="col-sm-3 col-form-label">Client ID:</label>
+                            <div class="col-sm-9">
+                              <div class="input-group">
+                                <div class="input-group-text">
+                                  <input type="checkbox" class="form-check-input mt-0 " name="c_clientid" id="id_c_clientid" value="on" checked="">
+                                </div>
+                                <input type="text" class="form-control form-control-sm required info" name="clientid" id="id_clientid" value="saltire.lti.app" placeholder="Parameter to be shared with tool">
+                              </div>
+                            </div>
+                            <label for="id_deploymentid" class="col-sm-3 col-form-label">Deployment ID:</label>
+                            <div class="col-sm-9">
+                              <div class="input-group">
+                                <div class="input-group-text">
+                                  <input type="checkbox" class="form-check-input mt-0 " name="c_deploymentid" id="id_c_deploymentid" value="on" checked="">
+                                </div>
+                                <input type="text" class="form-control form-control-sm required info" name="deploymentid" id="id_deploymentid" value="cLWwj9cbmkSrCNsckEFBmA" placeholder="Parameter to be shared with tool">
+                              </div>
+                            </div>
+                            <label for="id_authorization_id" class="col-sm-3 col-form-label">Authorization server ID:</label>
+                            <div class="col-sm-9">
+                              <input type="text" class="form-control form-control-sm info" name="authorization_id" id="id_authorization_id" value="" placeholder="Parameter to be shared with tool">
+                            </div>
+                            <label for="id_auth_request_url" class="col-sm-3 col-form-label">Authentication request URL:</label>
+                            <div class="col-sm-9">
+                              <input type="url" class="form-control form-control-sm info" name="auth_request_url" id="id_auth_request_url" value="https://saltire.lti.app/platform/auth" placeholder="Parameter to be shared with tool">
+                            </div>
+                            <label for="id_custom_oauth2_access_token_url2" class="col-sm-3 col-form-label">Access Token service URL:</label>
+                            <div class="col-sm-9">
+                              <input type="text" class="form-control form-control-sm info" name="custom_oauth2_access_token_url2" id="id_custom_oauth2_access_token_url2" value="https://saltire.lti.app/platform/token/cc2cb62fd31abecebada2ecc8836be3f" onchange="onAccessTokenUrlChange(this, '');" placeholder="Parameter to be shared with tool">
+                            </div>
+                            <label for="id_jku" class="col-sm-3 col-form-label">Public keyset URL:</label>
+                            <div class="col-sm-9">
+                              <div class="input-group">
+                                <div class="input-group-text">
+                                  <input type="checkbox" class="form-check-input mt-0 " name="c_jku" id="id_c_jku" value="on" checked="">
+                                </div>
+                                <input type="url" class="form-control form-control-sm info" name="jku" id="id_jku" value="https://saltire.lti.app/platform/jwks/cc2cb62fd31abecebada2ecc8836be3f" placeholder="Parameter to be shared with tool">
+                              </div>
+                            </div>
+                            <label for="id_kid" class="col-sm-3 col-form-label custom-control-description">Public Key ID:</label>
+                            <div class="col-sm-9">
+                              <div class="input-group">
+                                <input type="text" class="form-control form-control-sm" name="kid" id="id_kid" value="6ox0b5ag4w" onchange="onKidChange();">
+                                <select class="form-select form-select-sm col-sm-2" id="id_sel_kid" onchange="onSelKidChange(this);">
+                                  <option value="">Select ...</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div class="col-sm-6">
+                              <label for="id_privatekey" class="col-form-label custom-control-description">Private key:</label>
+                              <span class="float-end">
+                                <button type="button" class="btn btn-sm btn-main p-1 m-0" onclick="return doGenerateKey();"><i class="fas fa-key"></i> Generate new private key</button>
+                              </span>
+                              <textarea class="form-control form-control-sm" style="font-family: monospace; font-size: 80%;" name="privatekey" id="id_privatekey" rows="10" onchange="onPrivateKeyChange();"></textarea>
+                            </div>
+                            <div class="col-sm-6">
+                              <label for="id_publickey" class="col-form-label custom-control-description">Public key:</label>
+                              <span class="float-end">
+                                <button id="id_viewjsonpublickey" type="button" class="btn btn-sm btn-primary mb-1 disabled" data-bs-toggle="modal" data-bs-target="#id_jsonpublickey" onclick="return doViewJsonPublicKey(this);"><i class="fas fa-key"></i> View as JSON</button>
+                              </span>
+                              <textarea class="form-control form-control-sm" style="font-family: monospace; font-size: 80%;" id="id_publickey" rows="10" disabled=""></textarea>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="accordion-item mb-2 d-none">
+                      <div class="accordion-header" role="tab" id="id_securitymodel_tool_heading">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#id_card_securitymodel_tool" aria-expanded="true" aria-controls="id_card_securitymodel_tool">Tool Details</button>
+                      </div>
+                      <div id="id_card_securitymodel_tool" class="accordion-collapse collapse show" role="tabpanel" aria-labelledby="id_securitymodel_tool_heading">
+                        <div class="accordion-body pb-0 mb-0">
+                          <div class="float-end mb-3">
+                            <button type="button" class="btn btn-sm btn-main p-1 m-0 disabled" style="pointer-events: auto;" id="id_tools_save">
+                              <i class="far fa-save"></i> Save
+                            </button>
+                            <button type="button" class="btn btn-sm btn-main p-1 m-0 disabled" style="pointer-events: auto;" id="id_tools_register">
+                              <i class="fas fa-external-link-alt"></i> Register
+                            </button>
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-sm btn-main p-1 m-0 disabled" style="pointer-events: auto;" id="id_manage_tools" data-bs-toggle="modal" data-bs-target="#id_tools"><i class="fas fa-shapes"></i> Registered tools</button>
+                              <button type="button" class="btn btn-sm btn-main dropdown-toggle dropdown-toggle-split disabled" id="id_manage_tools_data" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="sr-only">Toggle Dropdown</span>
+                              </button>
+                              <div class="dropdown-menu dropdown-menu-right" id="id_manage_tools_menu" aria-labelledby="id_manage_tools_data">
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#id_tools">Manage all</a>
+                                <div class="dropdown-divider"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row clear">
+                            <label for="id_initiatelogin" class="col-sm-3 col-form-label">Initiate login URL:</label>
+                            <div class="col-sm-7">
+                              <input type="url" class="form-control form-control-sm required" name="initiatelogin" id="id_initiatelogin" value="http://localhost:9001/login.php" placeholder="Required parameter">
+                            </div>
+                            <div class="col-sm-2">
+                              Use: <select name="initiateloginmethod" id="id_initiateloginmethod" onchange="onFieldChange()"><option value="POST" selected="">POST</option><option value="GET">GET</option></select>
+                            </div>
+                            <div class="col-sm-3">
+                              <label for="id_redirection" class="col-form-label custom-control-description">Redirection URI(s):<br>
+                              <small class="text-muted">(one per line)</small></label>
+                            </div>
+                            <div class="col-sm-9 pb-1">
+                              <textarea class="form-control form-control-sm required" name="redirection" id="id_redirection" rows="3" placeholder="Required parameter">http://localhost:9001/game.php</textarea>
+                            </div>
+                            <label for="id_jwks" class="col-sm-3 col-form-label custom-control-description">Public keyset URL:</label>
+                            <div class="col-sm-7">
+                              <input type="url" class="form-control form-control-sm" name="jwks" id="id_jwks" value="" onchange="onJwksChange(this);">
+                            </div>
+                            <div class="col-sm-2">
+                              <button id="id_fetchtpkey" type="button" class="btn btn-sm btn-primary mb-1" onclick="return doFetchTpKey();"><i class="fas fa-cloud-download-alt"></i> Fetch</button>
+                            </div>
+                            <div class="col-sm-6">
+                              <label for="id_tpkey" class="col-form-label custom-control-description">Public key:</label>
+                              <span class="float-end">
+                                <button id="id_viewjsontpkey" type="button" class="btn btn-sm btn-primary mb-1 disabled" data-bs-toggle="modal" data-bs-target="#id_jsontpkey" onclick="return doViewJsonTpKey(this);"><i class="fas fa-key"></i> View as JSON</button>
+                              </span>
+                              <textarea class="form-control form-control-sm mb-2" style="font-family: monospace; font-size: 80%;" name="tpkey" id="id_tpkey" rows="10" onchange="onTpKeyChange(this);"></textarea>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
