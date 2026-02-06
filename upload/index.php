@@ -10,6 +10,10 @@ error_reporting(E_ALL);
 require_once 'auth.php';
 requireAuthentication();
 
+// Determine the base URL for the current directory to ensure all relative paths work correctly.
+// We use SCRIPT_NAME as it reliably points to the actual script file, unlike PHP_SELF which can include extra path info.
+$base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\') . '/';
+
 $game_path = null;
 $error_message = '';
 
@@ -39,10 +43,11 @@ $JSON_LTI_DATA = $lti_data ? json_encode($lti_data) : 'null';
 <html>
 <head>
     <title>H5P Content Viewer</title>
-    <script src="js/grading.js"></script>
+    <script src="<?php echo $base_url; ?>js/grading.js"></script>
     <script>
         var ses = <?php echo $JSON_LTI_DATA; ?>;
-        var contentPath = "<?php echo $game_path ? htmlspecialchars($game_path) : ''; ?>";
+        var baseUrl = "<?php echo $base_url; ?>";
+        var contentPath = "<?php echo $game_path ? $base_url . htmlspecialchars($game_path) : ''; ?>";
     </script>
     <style>
         body {
@@ -61,7 +66,7 @@ $JSON_LTI_DATA = $lti_data ? json_encode($lti_data) : 'null';
     <?php if ($game_path && !$error_message): ?>
         <div id="h5p-container"></div>
 
-        <script src="h5p-player/main.bundle.js"></script>
+        <script src="<?php echo $base_url; ?>h5p-player/main.bundle.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const el = document.getElementById('h5p-container');
@@ -73,8 +78,8 @@ $JSON_LTI_DATA = $lti_data ? json_encode($lti_data) : 'null';
                 const options = {
                     id: contentPath.replace(/\//g, '-'),
                     h5pJsonPath: contentPath,
-                    frameJs: 'h5p-player/frame.bundle.js',
-                    frameCss: 'h5p-player/styles/h5p.css',
+                    frameJs: '<?php echo $base_url; ?>h5p-player/frame.bundle.js',
+                    frameCss: '<?php echo $base_url; ?>h5p-player/styles/h5p.css',
                     frame: true,
                     fullScreen: true,
 
@@ -124,7 +129,7 @@ $JSON_LTI_DATA = $lti_data ? json_encode($lti_data) : 'null';
         <div style="padding: 20px; font-family: sans-serif;">
             <h2>Upload H5P Content</h2>
             <p>Please upload your H5P content package (.h5p file).</p>
-            <form action="upload_handler.php" method="post" enctype="multipart/form-data">
+            <form action="<?php echo $base_url; ?>upload_handler.php" method="post" enctype="multipart/form-data">
                 <input type="file" name="game_file" id="game_file" accept=".h5p" required>
                 <br><br>
                 <input type="submit" value="Upload H5P Content" name="submit">

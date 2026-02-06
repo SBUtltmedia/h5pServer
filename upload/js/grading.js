@@ -18,7 +18,8 @@ function postLTI(ses, name) {
         return formData.join('&');
     }
 
-    const url = `LTI/postLTI.php?name=${encodeURIComponent(name || '')}`;
+    const base = (typeof baseUrl !== 'undefined') ? baseUrl : '';
+    const url = `${base}LTI/postLTI.php?name=${encodeURIComponent(name || '')}`;
     // The 'ses' object is wrapped under a 'data' key to create the 'data[...]' parameter structure.
     const body = buildFormData(ses, 'data');
 
