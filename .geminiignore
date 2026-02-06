@@ -1,0 +1,4 @@
+*.h5p
+h5p-content/
+upload/h5p-content/
+vendor/h5p/
